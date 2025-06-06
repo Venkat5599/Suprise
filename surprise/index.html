@@ -1,11 +1,585 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Birthday Surprise ✨</title>
-    <meta http-equiv="refresh" content="0; url=surprise/index.html">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>誕生日 ✨</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #000000;
+            --text: #ffffff;
+            --gold: #c4a162;
+            --red: #ff3333;
+            --paper: #f4e4bc;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Noto Serif JP', sans-serif;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        /* Video Background */
+        .video-background {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            overflow: hidden;
+            background: var(--bg);
+        }
+
+        .video-background iframe {
+            width: 100vw;
+            height: 100vh;
+            object-fit: cover;
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        /* Overlay for better text visibility */
+        .video-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1;
+        }
+
+        /* Main Content - Increase z-index to appear above video */
+        .content {
+            position: relative;
+            z-index: 2;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Animated Background */
+        .animated-bg {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            background: #000;
+            overflow: hidden;
+        }
+
+        .leaves-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .leaf {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: var(--gold);
+            opacity: 0.3;
+            border-radius: 50%;
+            filter: blur(2px);
+            animation: falling 10s linear infinite;
+        }
+
+        @keyframes falling {
+            0% {
+                transform: translate(0, -10%) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.3;
+            }
+            90% {
+                opacity: 0.3;
+            }
+            100% {
+                transform: translate(100px, 110%) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Ghost of Tsushima Style Title */
+        .title-container {
+            text-align: center;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeIn 2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            animation-delay: 1s;
+        }
+
+        .main-title {
+            font-size: clamp(4rem, 15vw, 12rem);
+            font-weight: 700;
+            color: var(--gold);
+            line-height: 1;
+            text-shadow: 
+                0 0 20px rgba(196, 161, 98, 0.3),
+                0 0 40px rgba(196, 161, 98, 0.2);
+            opacity: 0;
+            transform: translateY(50px);
+            animation: titleReveal 1.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            animation-delay: 2s;
+        }
+
+        .subtitle {
+            font-size: clamp(2rem, 5vw, 3rem);
+            color: var(--paper);
+            margin-top: 2rem;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeUp 1.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            animation-delay: 2.5s;
+        }
+
+        /* Ink Effect - Updated for better performance */
+        .ink-splash {
+            position: fixed;
+            background: var(--gold);
+            border-radius: 50%;
+            mix-blend-mode: screen;
+            pointer-events: none;
+            opacity: 0;
+            transform: scale(0);
+            will-change: transform, opacity;
+        }
+
+        @keyframes inkSplash {
+            0% {
+                transform: scale(0);
+                opacity: 0.5;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 0;
+            }
+        }
+
+        /* Brush Stroke */
+        .brush-stroke {
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background: var(--gold);
+            transform: scaleX(0);
+            opacity: 0.5;
+        }
+
+        .brush-stroke.top {
+            top: 20%;
+            animation: brushStroke 1.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            animation-delay: 3s;
+        }
+
+        .brush-stroke.bottom {
+            bottom: 20%;
+            animation: brushStroke 1.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            animation-delay: 3.2s;
+        }
+
+        @keyframes brushStroke {
+            0% {
+                transform: scaleX(0);
+                filter: blur(0);
+            }
+            100% {
+                transform: scaleX(1);
+                filter: blur(2px);
+            }
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes titleReveal {
+            0% {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            50% {
+                opacity: 0.5;
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Enter Button */
+        .enter-button {
+            position: absolute;
+            bottom: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 1rem 3rem;
+            font-family: 'Noto Serif JP', sans-serif;
+            font-size: 1.2rem;
+            color: var(--gold);
+            background: transparent;
+            border: 1px solid var(--gold);
+            cursor: pointer;
+            opacity: 0;
+            transition: all 0.3s ease;
+            animation: fadeIn 1s ease forwards;
+            animation-delay: 4s;
+        }
+
+        .enter-button:hover {
+            background: var(--gold);
+            color: var(--bg);
+            text-shadow: none;
+        }
+
+        /* Red Accent Line */
+        .accent-line {
+            position: absolute;
+            width: 2px;
+            height: 50vh;
+            background: var(--red);
+            right: 10%;
+            top: 25%;
+            transform: scaleY(0);
+            animation: accentLine 1s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            animation-delay: 3.5s;
+        }
+
+        @keyframes accentLine {
+            to {
+                transform: scaleY(1);
+            }
+        }
+
+        /* Greeting Section */
+        .greeting-section {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 3;
+            opacity: 0;
+            transform: translateY(30px);
+            pointer-events: none;
+        }
+
+        .greeting-section.visible {
+            opacity: 1;
+            transform: translateY(0);
+            transition: all 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: auto;
+        }
+
+        .greeting-content {
+            text-align: center;
+            max-width: 1000px;
+            padding: 3rem;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--gold);
+            border-radius: 8px;
+        }
+
+        .greeting-content:hover {
+            transform: scale(1);
+        }
+
+        .greeting-text {
+            font-size: clamp(1.5rem, 3vw, 2rem);
+            color: var(--paper);
+            line-height: 1.8;
+            margin-bottom: 2rem;
+        }
+
+        .japanese-greeting {
+            font-size: clamp(2rem, 4vw, 3rem);
+            color: var(--gold);
+            margin-bottom: 1.5rem;
+            font-weight: 500;
+        }
+
+        .message-text {
+            font-size: 1.2rem;
+            color: var(--text);
+            line-height: 1.8;
+            margin-bottom: 2rem;
+        }
+
+        .signature {
+            font-size: 1.1rem;
+            color: var(--gold);
+            font-style: italic;
+        }
+
+        /* Update enter button to close initial view */
+        .enter-button.fade-out {
+            opacity: 0;
+            transform: translateX(-50%) translateY(20px);
+            pointer-events: none;
+        }
+
+        .content.fade-out {
+            opacity: 0;
+            transform: scale(0.95);
+            pointer-events: none;
+            transition: all 1s ease;
+        }
+
+        /* Profile Cards */
+        .profile-container {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+
+        .profile-card {
+            flex: 1;
+            max-width: 400px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid var(--gold);
+            padding: 2rem;
+            border-radius: 8px;
+            transform: translateY(30px);
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .greeting-section.visible .profile-card {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .greeting-section.visible .profile-card:nth-child(1) {
+            transition-delay: 0.3s;
+        }
+
+        .greeting-section.visible .profile-card:nth-child(2) {
+            transition-delay: 0.6s;
+        }
+
+        .profile-pic {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            margin: 0 auto 1.5rem;
+            border: 2px solid var(--gold);
+            overflow: hidden;
+            transform: scale(0.8);
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transition-delay: 0.8s;
+        }
+
+        .greeting-section.visible .profile-pic {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        .profile-pic img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .profile-name {
+            font-size: 1.5rem;
+            color: var(--gold);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .profile-message {
+            font-size: 1.1rem;
+            color: var(--paper);
+            line-height: 1.6;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .japanese-text {
+            font-size: 1.2rem;
+            color: var(--gold);
+            margin-bottom: 1rem;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.5s ease;
+            transition-delay: 1s;
+        }
+
+        .greeting-section.visible .japanese-text {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .profile-container {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .profile-card {
+                max-width: 100%;
+            }
+        }
+    </style>
 </head>
 <body>
-    <p>Redirecting to <a href="surprise/index.html">Birthday Surprise</a>...</p>
+    <!-- Video Background -->
+    <div class="video-background">
+        <iframe
+            src="https://drive.google.com/file/d/1kLxEAvG4PHnQmPokTBQkjm_1GGB0vife/preview"
+            allow="autoplay"
+            style="position: absolute; width: 100%; height: 100%; top: 0; left: 0; border: none;"
+            allowfullscreen
+        ></iframe>
+    </div>
+    <div class="video-overlay"></div>
+
+    <!-- Greeting Section -->
+    <div class="greeting-section">
+        <div class="greeting-content">
+            <div class="japanese-greeting">お誕生日おめでとう！✨</div>
+            <div class="profile-container">
+                <div class="profile-card">
+                    <div class="profile-pic">
+                        <img src="images/lu.jpg" alt="Senpaiyoyo">
+                    </div>
+                    <div class="japanese-text">誕生日おめでとう！</div>
+                    <div class="profile-name">Senpaiyoyo</div>
+                    <div class="profile-message">
+                        Dear Aya,<br><br>
+                        From our first chat on Discord to all the amazing conversations we've shared, 
+                        you've become such a wonderful friend! Your cheerful messages always brighten my day, 
+                        and I'm so grateful for our friendship across the miles.<br><br>
+                        Thank you for all the fun times, memes, and late-night chats! 💫
+                    </div>
+                </div>
+                <div class="profile-card">
+                    <div class="profile-pic">
+                        <img src="images/aya.png" alt="Aya">
+                    </div>
+                    <div class="japanese-text">18歳おめでとう！</div>
+                    <div class="profile-name">Aya</div>
+                    <div class="profile-message">
+                        May your 18th birthday be filled with joy, laughter, and unforgettable moments! 
+                        You're an amazing person who brings so much happiness to our Discord community. 
+                        Here's to celebrating this special milestone with you!<br><br>
+                        Stay awesome and keep shining! ✨
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="content">
+        <!-- Brush Strokes -->
+        <div class="brush-stroke top"></div>
+        <div class="brush-stroke bottom"></div>
+
+        <!-- Title -->
+        <div class="title-container">
+            <h1 class="main-title">誕生日</h1>
+            <h2 class="subtitle">お誕生日おめでとう</h2>
+        </div>
+
+        <!-- Red Accent Line -->
+        <div class="accent-line"></div>
+
+        <!-- Enter Button -->
+        <button class="enter-button">進む</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Debounce function to limit ink splash creation
+            function debounce(func, wait) {
+                let timeout;
+                return function executedFunction(...args) {
+                    const later = () => {
+                        clearTimeout(timeout);
+                        func(...args);
+                    };
+                    clearTimeout(timeout);
+                    timeout = setTimeout(later, wait);
+                };
+            }
+
+            // Improved ink splash effect
+            function createInkSplash(e) {
+                const splash = document.createElement('div');
+                splash.className = 'ink-splash';
+                
+                const size = Math.random() * 100 + 50;
+                splash.style.width = `${size}px`;
+                splash.style.height = `${size}px`;
+                
+                // Position relative to viewport
+                splash.style.left = `${e.clientX - size/2}px`;
+                splash.style.top = `${e.clientY - size/2}px`;
+                
+                document.body.appendChild(splash);
+
+                // Use animation instead of transition for better performance
+                splash.style.animation = 'inkSplash 1s cubic-bezier(0.4, 0, 0.2, 1) forwards';
+                
+                // Clean up
+                setTimeout(() => {
+                    splash.remove();
+                }, 1000);
+            }
+
+            // Debounced mouse move handler
+            const debouncedInkSplash = debounce((e) => {
+                if (Math.random() > 0.7) { // 30% chance to create splash
+                    createInkSplash(e);
+                }
+            }, 50);
+
+            // Add event listener with error handling
+            document.addEventListener('mousemove', (e) => {
+                try {
+                    debouncedInkSplash(e);
+                } catch (error) {
+                    console.error('Error creating ink splash:', error);
+                }
+            });
+
+            // Handle enter button click
+            const enterButton = document.querySelector('.enter-button');
+            const content = document.querySelector('.content');
+            const greetingSection = document.querySelector('.greeting-section');
+
+            enterButton.addEventListener('click', () => {
+                content.classList.add('fade-out');
+                enterButton.classList.add('fade-out');
+                
+                setTimeout(() => {
+                    greetingSection.classList.add('visible');
+                }, 500);
+            });
+        });
+    </script>
 </body>
 </html> 
