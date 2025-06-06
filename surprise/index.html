@@ -42,16 +42,13 @@
             height: 100vh;
             object-fit: cover;
             opacity: 0.6;
-            pointer-events: none;
             position: absolute;
-            width: 100%;
-            height: 100%;
             top: 0;
             left: 0;
-            border: none;
+            z-index: 0;
         }
 
-        /* Overlay */
+        /* Overlay for better text visibility */
         .video-overlay {
             position: fixed;
             inset: 0;
@@ -59,7 +56,7 @@
             z-index: 1;
         }
 
-        /* Content */
+        /* Main Content - Increase z-index to appear above video */
         .content {
             position: relative;
             z-index: 2;
@@ -69,7 +66,51 @@
             justify-content: center;
         }
 
-        /* Title */
+        /* Animated Background */
+        .animated-bg {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            background: #000;
+            overflow: hidden;
+        }
+
+        .leaves-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .leaf {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: var(--gold);
+            opacity: 0.3;
+            border-radius: 50%;
+            filter: blur(2px);
+            animation: falling 10s linear infinite;
+        }
+
+        @keyframes falling {
+            0% {
+                transform: translate(0, -10%) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.3;
+            }
+            90% {
+                opacity: 0.3;
+            }
+            100% {
+                transform: translate(100px, 110%) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Ghost of Tsushima Style Title */
         .title-container {
             text-align: center;
             opacity: 0;
@@ -102,7 +143,62 @@
             animation-delay: 2.5s;
         }
 
-        /* Animations */
+        /* Ink Effect - Updated for better performance */
+        .ink-splash {
+            position: fixed;
+            background: var(--gold);
+            border-radius: 50%;
+            mix-blend-mode: screen;
+            pointer-events: none;
+            opacity: 0;
+            transform: scale(0);
+            will-change: transform, opacity;
+        }
+
+        @keyframes inkSplash {
+            0% {
+                transform: scale(0);
+                opacity: 0.5;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 0;
+            }
+        }
+
+        /* Brush Stroke */
+        .brush-stroke {
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background: var(--gold);
+            transform: scaleX(0);
+            opacity: 0.5;
+        }
+
+        .brush-stroke.top {
+            top: 20%;
+            animation: brushStroke 1.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            animation-delay: 3s;
+        }
+
+        .brush-stroke.bottom {
+            bottom: 20%;
+            animation: brushStroke 1.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            animation-delay: 3.2s;
+        }
+
+        @keyframes brushStroke {
+            0% {
+                transform: scaleX(0);
+                filter: blur(0);
+            }
+            100% {
+                transform: scaleX(1);
+                filter: blur(2px);
+            }
+        }
+
         @keyframes fadeIn {
             to {
                 opacity: 1;
@@ -205,6 +301,51 @@
             border-radius: 8px;
         }
 
+        .greeting-content:hover {
+            transform: scale(1);
+        }
+
+        .greeting-text {
+            font-size: clamp(1.5rem, 3vw, 2rem);
+            color: var(--paper);
+            line-height: 1.8;
+            margin-bottom: 2rem;
+        }
+
+        .japanese-greeting {
+            font-size: clamp(2rem, 4vw, 3rem);
+            color: var(--gold);
+            margin-bottom: 1.5rem;
+            font-weight: 500;
+        }
+
+        .message-text {
+            font-size: 1.2rem;
+            color: var(--text);
+            line-height: 1.8;
+            margin-bottom: 2rem;
+        }
+
+        .signature {
+            font-size: 1.1rem;
+            color: var(--gold);
+            font-style: italic;
+        }
+
+        /* Update enter button to close initial view */
+        .enter-button.fade-out {
+            opacity: 0;
+            transform: translateX(-50%) translateY(20px);
+            pointer-events: none;
+        }
+
+        .content.fade-out {
+            opacity: 0;
+            transform: scale(0.95);
+            pointer-events: none;
+            transition: all 1s ease;
+        }
+
         /* Profile Cards */
         .profile-container {
             display: flex;
@@ -262,11 +403,19 @@
             object-fit: cover;
         }
 
-        .japanese-greeting {
-            font-size: clamp(2rem, 4vw, 3rem);
+        .profile-name {
+            font-size: 1.5rem;
             color: var(--gold);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .profile-message {
+            font-size: 1.1rem;
+            color: var(--paper);
+            line-height: 1.6;
+            text-align: center;
             margin-bottom: 1.5rem;
-            font-weight: 500;
         }
 
         .japanese-text {
@@ -283,21 +432,6 @@
         .greeting-section.visible .japanese-text {
             opacity: 1;
             transform: translateY(0);
-        }
-
-        .profile-name {
-            font-size: 1.5rem;
-            color: var(--gold);
-            margin-bottom: 1rem;
-            text-align: center;
-        }
-
-        .profile-message {
-            font-size: 1.1rem;
-            color: var(--paper);
-            line-height: 1.6;
-            text-align: center;
-            margin-bottom: 1.5rem;
         }
 
         /* Responsive Design */
@@ -317,12 +451,49 @@
     <!-- Video Background -->
     <div class="video-background">
         <iframe
-            src="https://drive.google.com/file/d/1kLxEAvG4PHnQmPokTBQkjm_1GGB0vife/preview"
+            src="https://drive.google.com/file/d/1kLxEAvG4PHnQmPokTBQkjm_1GGB0vife/preview?autoplay=1&loop=1&mute=1"
             allow="autoplay"
+            style="position: absolute; width: 100vw; height: 100vh; top: 0; left: 0; border: none; opacity: 0.6; z-index: 0;"
             allowfullscreen
         ></iframe>
     </div>
     <div class="video-overlay"></div>
+
+    <!-- Greeting Section -->
+    <div class="greeting-section">
+        <div class="greeting-content">
+            <div class="japanese-greeting">お誕生日おめでとう！✨</div>
+            <div class="profile-container">
+                <div class="profile-card">
+                    <div class="profile-pic">
+                        <img src="images/lu.jpg" alt="Senpaiyoyo">
+                    </div>
+                    <div class="japanese-text">誕生日おめでとう！</div>
+                    <div class="profile-name">Senpaiyoyo</div>
+                    <div class="profile-message">
+                        Dear Aya,<br><br>
+                        From our first chat on Discord to all the amazing conversations we've shared, 
+                        you've become such a wonderful friend! Your cheerful messages always brighten my day, 
+                        and I'm so grateful for our friendship across the miles.<br><br>
+                        Thank you for all the fun times, memes, and late-night chats! 💫
+                    </div>
+                </div>
+                <div class="profile-card">
+                    <div class="profile-pic">
+                        <img src="images/aya.png" alt="Aya">
+                    </div>
+                    <div class="japanese-text">18歳おめでとう！</div>
+                    <div class="profile-name">Aya</div>
+                    <div class="profile-message">
+                        May your 18th birthday be filled with joy, laughter, and unforgettable moments! 
+                        You're an amazing person who brings so much happiness to our Discord community. 
+                        Here's to celebrating this special milestone with you!<br><br>
+                        Stay awesome and keep shining! ✨
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Main Content -->
     <div class="content">
@@ -343,44 +514,61 @@
         <button class="enter-button">進む</button>
     </div>
 
-    <!-- Greeting Section -->
-    <div class="greeting-section">
-        <div class="greeting-content">
-            <div class="japanese-greeting">お誕生日おめでとう！✨</div>
-            <div class="profile-container">
-                <div class="profile-card">
-                    <div class="profile-pic">
-                        <img src="surprise/images/lu.jpg" alt="Senpaiyoyo">
-                    </div>
-                    <div class="japanese-text">誕生日おめでとう！</div>
-                    <div class="profile-name">Senpaiyoyo</div>
-                    <div class="profile-message">
-                        Dear Aya,<br><br>
-                        From our first chat on Discord to all the amazing conversations we've shared, 
-                        you've become such a wonderful friend! Your cheerful messages always brighten my day, 
-                        and I'm so grateful for our friendship across the miles.<br><br>
-                        Thank you for all the fun times, memes, and late-night chats! 💫
-                    </div>
-                </div>
-                <div class="profile-card">
-                    <div class="profile-pic">
-                        <img src="surprise/images/aya.png" alt="Aya">
-                    </div>
-                    <div class="japanese-text">18歳おめでとう！</div>
-                    <div class="profile-name">Aya</div>
-                    <div class="profile-message">
-                        May your 18th birthday be filled with joy, laughter, and unforgettable moments! 
-                        You're an amazing person who brings so much happiness to our Discord community. 
-                        Here's to celebrating this special milestone with you!<br><br>
-                        Stay awesome and keep shining! ✨
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Debounce function to limit ink splash creation
+            function debounce(func, wait) {
+                let timeout;
+                return function executedFunction(...args) {
+                    const later = () => {
+                        clearTimeout(timeout);
+                        func(...args);
+                    };
+                    clearTimeout(timeout);
+                    timeout = setTimeout(later, wait);
+                };
+            }
+
+            // Improved ink splash effect
+            function createInkSplash(e) {
+                const splash = document.createElement('div');
+                splash.className = 'ink-splash';
+                
+                const size = Math.random() * 100 + 50;
+                splash.style.width = `${size}px`;
+                splash.style.height = `${size}px`;
+                
+                // Position relative to viewport
+                splash.style.left = `${e.clientX - size/2}px`;
+                splash.style.top = `${e.clientY - size/2}px`;
+                
+                document.body.appendChild(splash);
+
+                // Use animation instead of transition for better performance
+                splash.style.animation = 'inkSplash 1s cubic-bezier(0.4, 0, 0.2, 1) forwards';
+                
+                // Clean up
+                setTimeout(() => {
+                    splash.remove();
+                }, 1000);
+            }
+
+            // Debounced mouse move handler
+            const debouncedInkSplash = debounce((e) => {
+                if (Math.random() > 0.7) { // 30% chance to create splash
+                    createInkSplash(e);
+                }
+            }, 50);
+
+            // Add event listener with error handling
+            document.addEventListener('mousemove', (e) => {
+                try {
+                    debouncedInkSplash(e);
+                } catch (error) {
+                    console.error('Error creating ink splash:', error);
+                }
+            });
+
             // Handle enter button click
             const enterButton = document.querySelector('.enter-button');
             const content = document.querySelector('.content');
@@ -397,4 +585,4 @@
         });
     </script>
 </body>
-</html> 
+</html>
